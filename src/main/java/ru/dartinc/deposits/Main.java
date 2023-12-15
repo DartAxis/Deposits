@@ -8,9 +8,11 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static Double POPOLNENIE = 50000.0;
-    public static Double PREMIYA = 800000.0;
-    public static Double START = 800000.0;
+    public static final Double POPOLNENIE = 50000.0; //раз в полмесяца
+    public static final Double PREMIYA = 500000.0;
+    public static final Double START = 0.0;
+
+
     public static void main(String[] args) {
         var mainAccount = new Account();
         mainAccount.setAmount(BigDecimal.valueOf(START));
@@ -28,11 +30,11 @@ public class Main {
             }
             if(nowDate.getDayOfMonth()%7==0 && mainAccount.getAmount().doubleValue()>=50000){
                 if(mainAccount.getDeposits().size()<12) {
-                    mainAccount.getDeposits().add(new Deposit(name,BigDecimal.valueOf(50000)
+                    mainAccount.getDeposits().add(new Deposit(name,mainAccount.getAmount()
                             , BigDecimal.valueOf(14.5)
                             , nowDate
                             , mainAccount));
-                    mainAccount.setAmount(mainAccount.getAmount().subtract(BigDecimal.valueOf(50000)));
+                    mainAccount.setAmount(BigDecimal.ZERO);
                     name++;
                 } else {
                     resheto(mainAccount, nowDate);
@@ -67,8 +69,7 @@ public class Main {
             var nowDay = nowDate.getDayOfMonth();
             var startDay = x.getStartDate().getDayOfMonth();
             var startMonth = x.getStartDate().getMonth().getValue();
-            if((nowMonth-startMonth)%3==0 && nowDay==startDay ) return true;
-            return false;
+            return (nowMonth - startMonth) % 3 == 0 && nowDay == startDay;
         }).collect(Collectors.toList());
         try {
             var depo = depos.stream().min((x1, x2) -> Double.compare(x1.getAmount().doubleValue(), x2.getAmount().doubleValue())).get();
@@ -88,7 +89,7 @@ public class Main {
                 }
             }
         } catch (Exception e){
-            //System.out.println("Пропускаем дату");
+
         }
     }
 

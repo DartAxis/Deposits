@@ -22,7 +22,7 @@ public class Deposit {
         this.yearPercent = yearPercent;
         this.startDate = startDate;
         this.account = account;
-        System.out.println("Открываем счет №" + this.name + "  от " + this.startDate + " на сумму: " + this.amount);
+        System.out.printf("Открываем счет №%s от %s на сумму: %.2f\n", this.name, this.startDate, this.amount.doubleValue());
     }
 
     public void checkDate(LocalDate date) {
@@ -44,7 +44,7 @@ public class Deposit {
         if (startDay == nowDay && (nowMonth - startMonth) % 3 == 0 && !date.equals(this.startDate)) {
             System.out.println("Закрываем счет №" + this.name + " от " + this.startDate);
             this.startDate = date;
-            System.out.println("Открываем счет №" + this.name + "  от " + this.startDate + " на сумму: " + this.amount);
+            System.out.printf("Открываем счет №%s от %s на сумму: %.2f\n", this.name, this.startDate, this.amount.doubleValue());
         }
     }
 
