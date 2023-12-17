@@ -10,29 +10,30 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static final Double POPOLNENIE = 5000.0; //раз в полмесяца
-    public static final Double PREMIYA = .0;
-    public static final Double START = 200000.0;
+    public static final Double POPOLNENIE = 1000.0; //раз в полмесяца
+    public static final Double PREMIYA = 0.0;
+    public static final Double START = 0.0;
 
 
     public static void main(String[] args) {
+        clearReport();
         var mainAccount = new Account();
         mainAccount.setAmount(BigDecimal.valueOf(START));
-        var startDate = LocalDate.of(2024,1,1);
-        var endDate = LocalDate.of(2047,12,31);
+        var startDate = LocalDate.of(2024, 1, 1);
+        var endDate = LocalDate.of(2064, 12, 31);
         LocalDate nowDate = startDate;
-        var name=1;
-        while(!nowDate.equals(endDate)){
+        var name = 1;
+        while (!nowDate.equals(endDate)) {
 
-            if(nowDate.getDayOfMonth()==5 || nowDate.getDayOfMonth()==20){
+            if (nowDate.getDayOfMonth() == 5 || nowDate.getDayOfMonth() == 20) {
                 mainAccount.setAmount(mainAccount.getAmount().add(BigDecimal.valueOf(POPOLNENIE)));
             }
-            if(nowDate.getDayOfMonth()==25 && nowDate.getMonth().getValue()==12){
+            if (nowDate.getDayOfMonth() == 25 && nowDate.getMonth().getValue() == 12) {
                 mainAccount.setAmount(mainAccount.getAmount().add(BigDecimal.valueOf(PREMIYA)));
             }
-            if(nowDate.getDayOfMonth()%7==0 && mainAccount.getAmount().doubleValue()>=50000){
-                if(mainAccount.getDeposits().size()<12) {
-                    mainAccount.getDeposits().add(new Deposit(name,mainAccount.getAmount()
+            if (nowDate.getDayOfMonth() % 7 == 0 && mainAccount.getAmount().doubleValue() >= 50000) {
+                if (mainAccount.getDeposits().size() < 12) {
+                    mainAccount.getDeposits().add(new Deposit(name, mainAccount.getAmount()
                             , BigDecimal.valueOf(15)
                             , nowDate
                             , mainAccount));
@@ -42,32 +43,45 @@ public class Main {
                     resheto(mainAccount, nowDate);
                 }
             }
-            for( Deposit depo:mainAccount.getDeposits()) {
-                if(!depo.getStartDate().equals(nowDate)){
+            for (Deposit depo : mainAccount.getDeposits()) {
+                if (!depo.getStartDate().equals(nowDate)) {
                     depo.checkDate(nowDate);
                 }
             }
-            nowDate=nowDate.plusDays(1l);
-            if(nowDate.getDayOfMonth()==1) System.out.println();
-            if((int)(mainAccount.getDeposits().stream().mapToDouble(x-> x.getAmount().doubleValue()).sum())==16800000) break;
-            if(nowDate.getYear()>startDate.getYear() && nowDate.getMonth().getValue()==1 && nowDate.getDayOfMonth()==1) yearStatic(mainAccount,nowDate,startDate);
+            nowDate = nowDate.plusDays(1l);
+            if (nowDate.getDayOfMonth() == 1) System.out.println();
+            if ((int) (mainAccount.getDeposits().stream().mapToDouble(x -> x.getAmount().doubleValue()).sum()) == 16800000)
+                break;
+            if (nowDate.getYear() > startDate.getYear() && nowDate.getMonth().getValue() == 1 && nowDate.getDayOfMonth() == 1)
+                yearStatic(mainAccount, nowDate, startDate);
         }
         System.out.println();
-        System.out.println("Дата начала построения лесенки: "+startDate);
-        System.out.println("Достигли предельного результата на дату: "+nowDate);
-        System.out.printf("Начальная сумма на счету была: %.2f\n",START);
-        System.out.printf("Сумма ежемесячного пополнения была 2 раза в месяц по %.2f\n",POPOLNENIE);
-        System.out.printf("Размер счёта на окончании лесенки: %.2f\n",mainAccount.getAmount().doubleValue());
-        System.out.println("Всего вкладов: "+ mainAccount.getDeposits().size());
-        for (Deposit depo:mainAccount.getDeposits()){
+        System.out.println("Дата начала построения лесенки: " + startDate);
+        System.out.println("Достигли предельного результата на дату: " + nowDate);
+        System.out.printf("Начальная сумма на счету была: %.2f\n", START);
+        System.out.printf("Сумма ежемесячного пополнения была 2 раза в месяц по %.2f\n", POPOLNENIE);
+        System.out.printf("Размер счёта на окончании лесенки: %.2f\n", mainAccount.getAmount().doubleValue());
+        System.out.println("Всего вкладов: " + mainAccount.getDeposits().size());
+        for (Deposit depo : mainAccount.getDeposits()) {
             System.out.println(depo);
         }
-        var sum = mainAccount.getDeposits().stream().mapToDouble(x-> x.getAmount().doubleValue()).sum();
+        var sum = mainAccount.getDeposits().stream().mapToDouble(x -> x.getAmount().doubleValue()).sum();
         System.out.printf("Суммарно на депозитах: %.2f", sum);
     }
 
+    private static void clearReport() {
+        try {
+            Path path = Paths.get("years_report.txt");
+            if (Files.exists(path)) {
+                Files.delete(path);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void resheto(Account mainAccount, LocalDate nowDate) {
-        var depos = mainAccount.getDeposits().stream().filter( x -> {
+        var depos = mainAccount.getDeposits().stream().filter(x -> {
             var nowMonth = nowDate.getMonth().getValue();
             var nowDay = nowDate.getDayOfMonth();
             var startDay = x.getStartDate().getDayOfMonth();
@@ -76,46 +90,46 @@ public class Main {
         }).collect(Collectors.toList());
         try {
             var depo = depos.stream().min((x1, x2) -> Double.compare(x1.getAmount().doubleValue(), x2.getAmount().doubleValue())).get();
-            if(depo.getAmount().doubleValue()+mainAccount.getAmount().doubleValue()<1400000) {
-                if(mainAccount.getAmount().doubleValue()>50000) {
+            if (depo.getAmount().doubleValue() + mainAccount.getAmount().doubleValue() < 1400000) {
+                if (mainAccount.getAmount().doubleValue() > 50000) {
                     depo.setAmount(depo.getAmount().add(mainAccount.getAmount()));
-                    System.out.println("Пополняем депозит №"+depo.getName()+ " на сумму: "+ mainAccount.getAmount().intValue());
+                    System.out.println("Пополняем депозит №" + depo.getName() + " на сумму: " + mainAccount.getAmount().intValue());
                     mainAccount.setAmount(BigDecimal.ZERO);
                 }
             } else {
                 var minus = BigDecimal.valueOf(1400000).subtract(depo.getAmount());
-                if(mainAccount.getAmount().doubleValue()>50000 && minus.doubleValue()>2) {
+                if (mainAccount.getAmount().doubleValue() > 50000 && minus.doubleValue() > 2) {
 
-                    System.out.println("Пополняем депозит №"+depo.getName()+ " на сумму: "+ minus.intValue());
+                    System.out.println("Пополняем депозит №" + depo.getName() + " на сумму: " + minus.intValue());
                     depo.setAmount(depo.getAmount().add(minus));
                     mainAccount.setAmount(mainAccount.getAmount().subtract(minus));
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
 
-    public static void yearStatic(Account mainAccount,LocalDate nowDate, LocalDate startDate){
+    public static void yearStatic(Account mainAccount, LocalDate nowDate, LocalDate startDate) {
         var result = new StringBuilder();
         result.append("\n")
-                        .append(String.format("Отчет на начало %s года\n",nowDate.getYear()))
-                                .append("Дата начала построения лесенки: ").append(startDate).append("\n")
-                        .append(String.format("Начальная сумма на счету была: %.2f\n",START))
-                                .append(String.format("Сумма ежемесячного пополнения была 2 раза в месяц по %.2f\n",POPOLNENIE))
-                                        .append(String.format("Размер счёта на окончании лесенки: %.2f\n",mainAccount.getAmount().doubleValue()))
-                                                .append(String.format("Всего вкладов: %d\n", mainAccount.getDeposits().size()));
-        for (Deposit depo:mainAccount.getDeposits()){
+                .append(String.format("Отчет на начало %s года\n", nowDate.getYear()))
+                .append("Дата начала построения лесенки: ").append(startDate).append("\n")
+                .append(String.format("Начальная сумма на счету была: %.2f\n", START))
+                .append(String.format("Сумма ежемесячного пополнения была 2 раза в месяц по %.2f\n", POPOLNENIE))
+                .append(String.format("Размер счёта на окончании лесенки: %.2f\n", mainAccount.getAmount().doubleValue()))
+                .append(String.format("Всего вкладов: %d\n", mainAccount.getDeposits().size()));
+        for (Deposit depo : mainAccount.getDeposits()) {
             result.append(depo.toString()).append("\n");
         }
-        var sum = mainAccount.getDeposits().stream().mapToDouble(x-> x.getAmount().doubleValue()).sum();
+        var sum = mainAccount.getDeposits().stream().mapToDouble(x -> x.getAmount().doubleValue()).sum();
         result.append(String.format("Суммарно на депозитах: %.2f\n", sum))
-                .append(String.format("Общая сумма средств : %.2f\n\n",sum+mainAccount.getAmount().doubleValue()));
+                .append(String.format("Общая сумма средств : %.2f\n\n", sum + mainAccount.getAmount().doubleValue()));
         System.out.println(result);
 
         try {
             Path path = Paths.get("years_report.txt");
-            if(Files.exists(path)) {
+            if (Files.exists(path)) {
                 Files.writeString(path, result.toString(), StandardOpenOption.APPEND);
             } else {
                 Files.writeString(path, result.toString(), StandardOpenOption.CREATE_NEW);
