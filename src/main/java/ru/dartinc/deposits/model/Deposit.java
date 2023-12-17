@@ -26,14 +26,10 @@ public class Deposit {
     }
 
     public void checkDate(LocalDate date) {
-        var nowYear = date.getYear();
         var nowMonth = date.getMonth().getValue();
         var nowDay = date.getDayOfMonth();
-
-        var startYear = startDate.getYear();
         var startMonth = startDate.getMonth().getValue();
         var startDay = startDate.getDayOfMonth();
-
         if (startDay == nowDay && nowMonth - startMonth >= 0) {
             BigDecimal monthPercent = BigDecimal.valueOf(yearPercent.doubleValue() / 12);
             var adding = this.amount.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP).multiply(monthPercent);

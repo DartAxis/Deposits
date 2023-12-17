@@ -3,14 +3,16 @@ package ru.dartinc.deposits;
 import ru.dartinc.deposits.model.Account;
 import ru.dartinc.deposits.model.Deposit;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static final Double POPOLNENIE = 50000.0; //раз в полмесяца
-    public static final Double PREMIYA = 500000.0;
-    public static final Double START = 0.0;
+    public static final Double POPOLNENIE = 5000.0; //раз в полмесяца
+    public static final Double PREMIYA = .0;
+    public static final Double START = 200000.0;
 
 
     public static void main(String[] args) {
@@ -31,7 +33,7 @@ public class Main {
             if(nowDate.getDayOfMonth()%7==0 && mainAccount.getAmount().doubleValue()>=50000){
                 if(mainAccount.getDeposits().size()<12) {
                     mainAccount.getDeposits().add(new Deposit(name,mainAccount.getAmount()
-                            , BigDecimal.valueOf(14.5)
+                            , BigDecimal.valueOf(15)
                             , nowDate
                             , mainAccount));
                     mainAccount.setAmount(BigDecimal.ZERO);
@@ -48,6 +50,7 @@ public class Main {
             nowDate=nowDate.plusDays(1l);
             if(nowDate.getDayOfMonth()==1) System.out.println();
             if((int)(mainAccount.getDeposits().stream().mapToDouble(x-> x.getAmount().doubleValue()).sum())==16800000) break;
+            if(nowDate.getYear()>startDate.getYear() && nowDate.getMonth().getValue()==1 && nowDate.getDayOfMonth()==1) yearStatic(mainAccount,nowDate,startDate);
         }
         System.out.println();
         System.out.println("Дата начала построения лесенки: "+startDate);
@@ -93,5 +96,33 @@ public class Main {
         }
     }
 
+    public static void yearStatic(Account mainAccount,LocalDate nowDate, LocalDate startDate){
+        var result = new StringBuilder();
+        result.append("\n")
+                        .append(String.format("Отчет на начало %s года\n",nowDate.getYear()))
+                                .append("Дата начала построения лесенки: ").append(startDate).append("\n")
+                        .append(String.format("Начальная сумма на счету была: %.2f\n",START))
+                                .append(String.format("Сумма ежемесячного пополнения была 2 раза в месяц по %.2f\n",POPOLNENIE))
+                                        .append(String.format("Размер счёта на окончании лесенки: %.2f\n",mainAccount.getAmount().doubleValue()))
+                                                .append(String.format("Всего вкладов: %d\n", mainAccount.getDeposits().size()));
+        for (Deposit depo:mainAccount.getDeposits()){
+            result.append(depo.toString()).append("\n");
+        }
+        var sum = mainAccount.getDeposits().stream().mapToDouble(x-> x.getAmount().doubleValue()).sum();
+        result.append(String.format("Суммарно на депозитах: %.2f\n", sum))
+                .append(String.format("Общая сумма средств : %.2f\n\n",sum+mainAccount.getAmount().doubleValue()));
+        System.out.println(result);
 
+        try {
+            Path path = Paths.get("years_report.txt");
+            if(Files.exists(path)) {
+                Files.writeString(path, result.toString(), StandardOpenOption.APPEND);
+            } else {
+                Files.writeString(path, result.toString(), StandardOpenOption.CREATE_NEW);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }
