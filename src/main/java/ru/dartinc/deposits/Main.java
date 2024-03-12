@@ -10,12 +10,12 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static final Double POPOLNENIE = 75000.0; //раз в полмесяца
-    public static final Double PREMIYA = 450000.0;
-    public static final Double START = 800000.0;
+    public static final Double POPOLNENIE = 50000.0; // пополнение основного счета раз в полмесяца
+    public static final Double PREMIYA = 0.0; // получение годовой премии
+    public static final Double START = 1050000.0; // стартовая сумма на счёте
 
-    public static final Double YEAR_PERCENT=15.0;
-    public static final Integer ACC=18;
+    public static final Double YEAR_PERCENT=15.00; // годовой банковский процент
+    public static final Integer ACC=4; // кол-во открываемых счетов формирующих пассивный доход
 
 
 
@@ -23,13 +23,13 @@ public class Main {
         clearReport();
         var mainAccount = new Account();
         mainAccount.setAmount(BigDecimal.valueOf(START));
-        var startDate = LocalDate.of(2024, 1, 29);
+        var startDate = LocalDate.of(2024, 3, 29);
         var endDate = LocalDate.of(2064, 12, 31);
         LocalDate nowDate = startDate;
         var name = 1;
         while (!nowDate.equals(endDate)) {
 
-            if (nowDate.getDayOfMonth() == 10 || nowDate.getDayOfMonth() == 25) {
+            if (nowDate.getDayOfMonth() == 5 || nowDate.getDayOfMonth() == 20) {
                 mainAccount.setAmount(mainAccount.getAmount().add(BigDecimal.valueOf(POPOLNENIE)));
             }
             if (nowDate.getDayOfMonth() == 25 && nowDate.getMonth().getValue() == 12) {
