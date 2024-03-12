@@ -1,5 +1,6 @@
 package ru.dartinc.deposits;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.dartinc.deposits.model.Account;
 import ru.dartinc.deposits.model.Deposit;
 
@@ -9,6 +10,7 @@ import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class Main {
     public static final Double POPOLNENIE = 50000.0; // пополнение основного счета раз в полмесяца
     public static final Double PREMIYA = 0.0; // получение годовой премии
@@ -65,8 +67,11 @@ public class Main {
                     depo.checkDate(nowDate);
                 }
             }
-            nowDate = nowDate.plusDays(1l);
-            if (nowDate.getDayOfMonth() == 1) System.out.println();
+            nowDate = nowDate.plusDays(1L);
+            if (nowDate.getDayOfMonth() == 1)
+            {
+                System.out.println();
+            }
             if ((int) (mainAccount.getDeposits().stream().mapToDouble(x -> x.getAmount().doubleValue()).sum()) == ACC*1400000)
                 break;
             if (nowDate.getYear() > startDate.getYear() && nowDate.getMonth().getValue() == 1 && nowDate.getDayOfMonth() == 1)
