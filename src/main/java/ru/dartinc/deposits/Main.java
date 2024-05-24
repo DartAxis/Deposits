@@ -1,23 +1,25 @@
 package ru.dartinc.deposits;
 
-import lombok.extern.slf4j.Slf4j;
 import ru.dartinc.deposits.model.Account;
 import ru.dartinc.deposits.model.Deposit;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
-@Slf4j
-public class Main {
-    public static final Double POPOLNENIE = 50000.0; // пополнение основного счета раз в полмесяца
-    public static final Double PREMIYA = 0.0; // получение годовой премии
-    public static final Double START = 1050000.0; // стартовая сумма на счёте
 
-    public static final Double YEAR_PERCENT=15.00; // годовой банковский процент
-    public static final Integer ACC=4; // кол-во открываемых счетов формирующих пассивный доход
+public class Main {
+    public static Double POPOLNENIE = 53000.0; // пополнение основного счета раз в полмесяца
+    public static Double PREMIYA = 650000.0; // получение годовой премии
+    public static Double START = 250000.0; // стартовая сумма на счёте
+
+    public static Double YEAR_PERCENT=17.00; // годовой банковский процент
+    public static Integer ACC=20; // кол-во открываемых счетов формирующих пассивный доход
 
 
 
@@ -25,12 +27,15 @@ public class Main {
         clearReport();
         var mainAccount = new Account();
         mainAccount.setAmount(BigDecimal.valueOf(START));
-        var startDate = LocalDate.of(2024, 3, 29);
+        var startDate = LocalDate.of(2024, 7, 21);
         var endDate = LocalDate.of(2064, 12, 31);
         LocalDate nowDate = startDate;
         var name = 1;
         while (!nowDate.equals(endDate)) {
-
+            if(nowDate.getMonth().getValue() == 8 && nowDate.getDayOfMonth() == 5){
+                POPOLNENIE+=POPOLNENIE*0.15;
+                PREMIYA+=PREMIYA*0.15;
+            }
             if (nowDate.getDayOfMonth() == 5 || nowDate.getDayOfMonth() == 20) {
                 mainAccount.setAmount(mainAccount.getAmount().add(BigDecimal.valueOf(POPOLNENIE)));
             }
